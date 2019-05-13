@@ -4111,6 +4111,29 @@ gui_mch_new_colors(void)
 
 	g_free(css);
 	g_object_unref(provider);
+
+	/*
+	 * 修改右/下边多余的一部分背景色
+	 * derry,2019.5.13
+	 */
+	{
+	    GtkStyleContext *context;
+	    GtkCssProvider *provider;
+
+	    context = gtk_widget_get_style_context (gui.formwin);
+	    provider = gtk_css_provider_new ();
+	    gchar * const css = g_strdup_printf(
+		    "* {background-color: #%.2lx%.2lx%.2lx;}\n",
+		    (gui.back_pixel >> 16) & 0xff,
+		    (gui.back_pixel >> 8) & 0xff,
+		    gui.back_pixel & 0xff);
+	    gtk_css_provider_load_from_data(provider, css, -1, NULL);
+	    gtk_style_context_add_provider(context,
+		    GTK_STYLE_PROVIDER(provider),
+		    GTK_STYLE_PROVIDER_PRIORITY_USER);
+	    g_free(css);
+	    g_object_unref(provider);
+	}
 #elif GTK_CHECK_VERSION(3,4,0) /* !GTK_CHECK_VERSION(3,22,2) */
 	GdkRGBA rgba;
 
